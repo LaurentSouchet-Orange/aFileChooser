@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <drawable name="shape_transparent">@android:color/transparent</drawable>
+    <drawable name="shape_white">@color/base_white</drawable>
+    <drawable name="shape_accent_light">@color/base_accent_light</drawable>
+</resources>

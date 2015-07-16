@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/action_multifile_select_all"
+        android:icon="@drawable/ic_action_select_all"
+        android:title="@string/select_all"
+        android:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_multifile_upload"
+        android:icon="@drawable/ic_action_upload"
+        android:title="@string/upload_file"
+        android:showAsAction="ifRoom" />
+
+</menu>

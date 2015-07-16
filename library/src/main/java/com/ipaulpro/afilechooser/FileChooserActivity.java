@@ -18,6 +18,7 @@ package com.ipaulpro.afilechooser;
 
 import android.app.ActionBar;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -35,6 +36,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  * Main Activity that handles the FileListFragments
@@ -44,6 +46,8 @@ import java.io.File;
  */
 public class FileChooserActivity extends FragmentActivity implements
         OnBackStackChangedListener, FileListFragment.Callbacks {
+
+    public static final String AFILECHOOSER_FILE_URI_KEY = "afilechooser.file.uri.key";
 
     public static final String PATH = "path";
     public static final String EXTERNAL_BASE_PATH = Environment
@@ -56,7 +60,7 @@ public class FileChooserActivity extends FragmentActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             Toast.makeText(context, R.string.storage_removed, Toast.LENGTH_LONG).show();
-            finishWithResult(null);
+            finishWithoutResult();
         }
     };
 
@@ -165,19 +169,32 @@ public class FileChooserActivity extends FragmentActivity implements
                 .addToBackStack(mPath).commit();
     }
 
-    /**
-     * Finish this Activity with a result code and URI of the selected file.
-     *
-     * @param file The file selected.
-     */
-    private void finishWithResult(File file) {
-        if (file != null) {
-            Uri uri = Uri.fromFile(file);
-            setResult(RESULT_OK, new Intent().setData(uri));
+    private void finishWithoutResult() {
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+    private void finishWithResults(ArrayList<File> files) {
+
+        if(files != null && files.size() > 0) {
+
+            Intent intent = new Intent();
+
+            if(files.size() == 1) {
+                Uri uri = Uri.fromFile(files.get(0));
+                intent.setData(uri);
+            } else {
+                ArrayList<String> filesString = new ArrayList<String>(files.size());
+                for(File file : files) {
+                    Uri uri = Uri.fromFile(file);
+                    filesString.add(uri.toString());
+                }
+                intent.putStringArrayListExtra(AFILECHOOSER_FILE_URI_KEY, filesString);
+            }
+
+            setResult(RESULT_OK, intent);
             finish();
         } else {
-            setResult(RESULT_CANCELED);
-            finish();
+            finishWithoutResult();
         }
     }
 
@@ -189,15 +206,16 @@ public class FileChooserActivity extends FragmentActivity implements
     @Override
     public void onFileSelected(File file) {
         if (file != null) {
-            if (file.isDirectory()) {
-                replaceFragment(file);
-            } else {
-                finishWithResult(file);
-            }
+            replaceFragment(file);
         } else {
             Toast.makeText(FileChooserActivity.this, R.string.error_selecting_file,
                     Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onFilesSelected(ArrayList<File> files) {
+        finishWithResults(files);
     }
 
     /**
